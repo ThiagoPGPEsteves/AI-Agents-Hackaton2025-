@@ -66,7 +66,7 @@ class ThreatAnalyzerTool(BaseTool):
 
 
 class ThreatMitigatorInput(BaseModel):
-    """Input schema para mitigar ameaças."""
+    """Input schema para as mitigar ameaças."""
     ip_address: str = Field(..., description="Endereço IP suspeito a ser bloqueado.")
 
 class ThreatMitigatorTool(BaseTool):
