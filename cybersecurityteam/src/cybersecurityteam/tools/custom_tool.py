@@ -150,3 +150,5 @@ class ThreatMitigatorTool(BaseTool):
 
 #     return Tool(name="SQL Monitor", description="Analisa logs SQL para identificar ataques.", function=analyze_queries)
    
+
+   
