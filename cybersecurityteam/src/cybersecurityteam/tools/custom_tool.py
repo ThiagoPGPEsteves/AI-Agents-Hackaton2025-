@@ -73,12 +73,7 @@ class ThreatMitigatorTool(BaseTool):
     name: str = "Threat Mitigator"
     description: str = "Executa ações para mitigar ameaças, incluindo bloqueio de IPs."
     args_schema: Type[BaseModel] = ThreatMitigatorInput
-
-    def _run(self, ip_address: str) -> str:
-        firewall_api = "https://firewall.example.com/block"  # Substituir pela API real
-        response = requests.post(firewall_api, json={"ip": ip_address})
-        
-        return f" IP {ip_address} bloqueado!" if response.status_code == 200 else "Erro ao bloquear IP."
+    
     def _run(self, ip_address: str) -> str:
         """
         Bloqueia um IP suspeito chamando uma API de firewall.
