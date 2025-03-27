@@ -1,0 +1,23 @@
+[project]
+name = "cybersecurityteam"
+version = "0.1.0"
+description = "cybersecurityteam using crewAI"
+authors = [{ name = "Agentes cap", email = "you@example.com" }]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "crewai[tools]>=0.108.0,<1.0.0"
+]
+
+[project.scripts]
+cybersecurityteam = "cybersecurityteam.main:run"
+run_crew = "cybersecurityteam.main:run"
+train = "cybersecurityteam.main:train"
+replay = "cybersecurityteam.main:replay"
+test = "cybersecurityteam.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
