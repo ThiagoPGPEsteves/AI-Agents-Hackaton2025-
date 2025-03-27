@@ -70,7 +70,7 @@ class ThreatMitigatorInput(BaseModel):
     ip_address: str = Field(..., description="Endereço IP suspeito a ser bloqueado.")
 
 class ThreatMitigatorTool(BaseTool):
-    name: str = "Threat Mitigator"
+    name: str = "Threat_Mitigator"
     description: str = "Executa ações para mitigar ameaças, incluindo bloqueio de IPs."
     args_schema: Type[BaseModel] = ThreatMitigatorInput
 
@@ -115,7 +115,7 @@ class ActivityLoggerInput(BaseModel):
     severity: str = Field(..., description="Nível de severidade do evento (INFO, ALERTA, CRÍTICO).")
 
 class ActivityLoggerTool(BaseTool):
-    name: str = "Activity Logger"
+    name: str = "Activity_Logger"
     description: str = "Registra eventos do sistema para auditoria e análise de ameaças."
     args_schema: Type[BaseModel] = ActivityLoggerInput
 
@@ -134,7 +134,7 @@ class ThreatReportInput(BaseModel):
     detected_by: str = Field(..., description="Nome do agente que identificou a ameaça.")
 
 class ThreatReportTool(BaseTool):
-    name: str = "Threat Report Generator"
+    name: str = "Threat_Report_Generator"
     description: str = "Gera relatórios detalhados sobre ameaças detectadas."
     args_schema: Type[BaseModel] = ThreatReportInput
 
@@ -154,7 +154,7 @@ class ThreatNotifierInput(BaseModel):
     contact_email: str = Field(..., description="E-mail do administrador para envio do alerta.")
 
 class ThreatNotifierTool(BaseTool):
-    name: str = "Threat Notifier"
+    name: str = "Threat_Notifier"
     description: str = "Envia alertas de ameaças para os administradores do sistema."
     args_schema: Type[BaseModel] = ThreatNotifierInput
 
