@@ -46,7 +46,7 @@ class ThreatAnalyzerInput(BaseModel):
     queries: List[str] = Field(..., description="Lista de queries suspeitas para classificação.")
 
 class ThreatAnalyzerTool(BaseTool):
-    name: str = "Threat Analyzer"
+    name: str = "Threat_Analyzer"
     description: str = "Classifica queries suspeitas conforme nível de risco."
     args_schema: Type[BaseModel] = ThreatAnalyzerInput
 
@@ -73,7 +73,7 @@ class ThreatMitigatorTool(BaseTool):
     name: str = "Threat Mitigator"
     description: str = "Executa ações para mitigar ameaças, incluindo bloqueio de IPs."
     args_schema: Type[BaseModel] = ThreatMitigatorInput
-    
+
     def _run(self, ip_address: str) -> str:
         """
         Bloqueia um IP suspeito chamando uma API de firewall.

@@ -38,7 +38,7 @@ class Cybersecurityteam():
     def monitor_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['monitor_agent'],
-            tools=[],
+            tools=[Analyze_logs(), Threat_Analyzer()],
             verbose=True
         )
     @agent
