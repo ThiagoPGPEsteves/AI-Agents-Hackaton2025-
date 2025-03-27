@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detector de Ameaças</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #resultado {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Insira um texto para análise</h2>
+    <textarea id="textoUsuario" placeholder="Digite seu texto aqui..."></textarea>
+    <br>
+    <button onclick="analisarTexto()">Analisar Ameaça</button>
+    
+    <div id="resultado"></div>
+
+    <script>
+        async function analisarTexto() {
+            const texto = document.getElementById("textoUsuario").value;
+
+            if (!texto.trim()) {
+                alert("Por favor, insira um texto para análise.");
+                return;
+            }
+
+            // Enviar o texto para o backend Flask
+            const respostaIA = await fetch("http://127.0.0.1:5000/analisar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ texto })
+            })
+            .then(response => response.json())
+            .catch(error => console.error("Erro:", error));
+
+            // Exibir resultado
+            document.getElementById("resultado").innerText = respostaIA?.mensagem || "Erro ao analisar.";
+        }
+    </script>
+
+</body>
+</html>
