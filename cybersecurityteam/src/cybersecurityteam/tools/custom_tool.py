@@ -2,7 +2,7 @@ from crewai.tools import BaseTool, tool
 from typing import Type
 from pydantic import BaseModel, Field
 import requests
-
+from datetime import datetime
 
 # class MyCustomToolInput(BaseModel):
 #     """Input schema for MyCustomTool."""
@@ -110,6 +110,70 @@ class ThreatMitigatorTool(BaseTool):
         except requests.exceptions.RequestException as e:
             #  Captura erros de requisição (exemplo: timeout, conexão falhou)
             return f" Erro ao conectar com a API do firewall: {str(e)}"
+
+
+
+
+class ActivityLoggerInput(BaseModel):
+    """Input schema para o registro de atividades."""
+    event: str = Field(..., description="Descrição do evento ocorrido.")
+    severity: str = Field(..., description="Nível de severidade do evento (INFO, ALERTA, CRÍTICO).")
+
+class ActivityLoggerTool(BaseTool):
+    name: str = "Activity Logger"
+    description: str = "Registra eventos do sistema para auditoria e análise de ameaças."
+    args_schema: Type[BaseModel] = ActivityLoggerInput
+
+    def _run(self, event: str, severity: str) -> str:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] {severity}: {event}"
+        
+        # Aqui poderíamos salvar em um banco ou arquivo
+        print(log_entry)
+        
+        return f" Evento registrado: {log_entry}"
+    
+class ThreatReportInput(BaseModel):
+    """Input schema para geração de relatórios."""
+    threats: List[str] = Field(..., description="Lista de ameaças identificadas.")
+    detected_by: str = Field(..., description="Nome do agente que identificou a ameaça.")
+
+class ThreatReportTool(BaseTool):
+    name: str = "Threat Report Generator"
+    description: str = "Gera relatórios detalhados sobre ameaças detectadas."
+    args_schema: Type[BaseModel] = ThreatReportInput
+
+    def _run(self, threats: List[str], detected_by: str) -> str:
+        report = f" Relatório de Segurança\n\nAmeaças detectadas:\n"
+        report += "\n".join(f"- {threat}" for threat in threats)
+        report += f"\n\n Detectado por: {detected_by}"
+
+        # Simula salvar um relatório (poderia ser um envio para um sistema)
+        print(report)
+        
+        return f" Relatório gerado com sucesso!"
+    
+class ThreatNotifierInput(BaseModel):
+    """Input schema para envio de alertas."""
+    message: str = Field(..., description="Mensagem de alerta para os administradores.")
+    contact_email: str = Field(..., description="E-mail do administrador para envio do alerta.")
+
+class ThreatNotifierTool(BaseTool):
+    name: str = "Threat Notifier"
+    description: str = "Envia alertas de ameaças para os administradores do sistema."
+    args_schema: Type[BaseModel] = ThreatNotifierInput
+
+    def _run(self, message: str, contact_email: str) -> str:
+        # Simula envio de e-mail (poderia integrar com um serviço real)
+        alert = f" Enviando alerta para {contact_email}:\n\n{message}"
+        print(alert)
+        
+        return f" Alerta enviado para {contact_email}!"
+
+
+
+
+
 
 
 
