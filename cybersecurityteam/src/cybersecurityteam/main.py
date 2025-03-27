@@ -17,7 +17,6 @@ def run():
     """
     Run the crew.
     """
-    print( "5")
     inputs = {
         'current_year': str(datetime.now().year)
     }
