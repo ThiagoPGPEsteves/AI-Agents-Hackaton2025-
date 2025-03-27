@@ -19,25 +19,33 @@
 
 monitor_task:
   description: >
+    Analisar logs de queries para identificar possíveis ataques
     Identificar o que são queries dentro dos textos recebidos
     Identificar as queries que foram feitas uma em seguida da outra, ou seja, se estão relacionadas 
     Coletar queries de atividades recentes e repassá-los ao analista.
+  expected_output: >
+    Lista de queries suspeitas identificadas para análise
 
   agent: monitor_agent
 
 analyst_task:
     description: >
       Analisar as queries e identificar possíveis ameaças
+      Classificar as queries suspeitas e definir o nível de ameaça
       Identificar padrões suspeitos como OR 1=1, DROP TABLE, GRANT ALL
       Analisar volume de consultas (muitos SELECTs seguidos podem ser exfiltração)
       Identificar usuários acessando dados que não deveriam
       Monitorar tentativas de login repetidas com senhas diferentes
       E identificar muitos outros tipos de ameaças possíveis
+    expected_output: >
+      Classificação das ameaças com sugestões de mitigação
 
     agent: analyst_agent
 
 executor_task:
   description: >
     Com base nos achados do analista, tomar ações de mitigação
+  expected_output: >
+    Bloquear IPs, encerrar sessões ou alertar a equipe de segurança
 
   agent: executor_agent
