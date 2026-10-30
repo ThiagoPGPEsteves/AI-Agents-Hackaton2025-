@@ -1,6 +1,12 @@
 # Environment variables
 .env
+**/.env
 .env.*
+!.env.example
+
+# Documentação local (somente o README.md é versionado)
+*.md
+!README.md
 
 # Python
 __pycache__/
@@ -39,6 +45,8 @@ ENV/
 # Project specific
 output
 *.log
+logs/
+state/
 
 # OS specific
 .DS_Store

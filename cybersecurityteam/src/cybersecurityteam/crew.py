@@ -1,74 +1,67 @@
-from crewai import Agent, Crew, Process, Task
+import os
+from pathlib import Path
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
-from dotenv import load_dotenv
+from .config import settings
+from .models import ThreatAssessment, ResponsePlan
 
-load_dotenv()
-
-
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+CONFIG_DIR = Path(__file__).resolve().parent / "config"
 
 @CrewBase
-class Cybersecurityteam():
-    """Cybersecurityteam crew"""
+class IncidentCrew:
+    """Crew especializada em triagem forense e resposta a incidentes de segurança."""
+    agents_config = str(CONFIG_DIR / "agents.yaml")
+    tasks_config = str(CONFIG_DIR / "tasks.yaml")
 
-    
-    agents_config = 'config/agents.yaml'
-    tasks_config = 'config/tasks.yaml'
-
-   
-    @agent
-    def monitor_agent(self) -> Agent:
-        return Agent(
-            config=self.agents_config['monitor_agent'],
-            tools=[Analyze_logs(),Activity_Logger() ],
-            verbose=True
+    def __init__(self):
+        # Garante que a chave da API esteja disponível no ambiente para o SDK do Gemini
+        if settings.gemini_api_key:
+            os.environ["GEMINI_API_KEY"] = settings.gemini_api_key
+        self.llm = LLM(
+            model=settings.model,
+            api_key=settings.gemini_api_key,
+            temperature=0.2
         )
+
     @agent
     def analyst_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['analyst_agent'],
-            tools=[Threat_Analyzer(),Threat_Report_Generator()],
-            verbose=True
-        )
-    @agent
-    def executor_agent(self) -> Agent:
-        return Agent(
-            config=self.agents_config['executor_agent'],
-            tools=[Threat_Mitigator(),Threat_Notifier()],
-            verbose=True
+            config=self.agents_config["analyst_agent"],
+            llm=self.llm,
+            max_iter=3,
+            max_rpm=30,
+            verbose=False
         )
 
-  
-    @task
-    def monitor_task(self) -> Task:
-        return Task(
-           config=self.tasks_config['monitor_task'],
-    )
+    @agent
+    def responder_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config["responder_agent"],
+            llm=self.llm,
+            max_iter=3,
+            max_rpm=30,
+            verbose=False
+        )
 
     @task
     def analyst_task(self) -> Task:
         return Task(
-            config=self.tasks_config['analyst_task'],
+            config=self.tasks_config["analyst_task"],
+            output_pydantic=ThreatAssessment
         )
 
     @task
-    def executor_task(self) -> Task:
+    def responder_task(self) -> Task:
         return Task(
-            config=self.tasks_config['executor_task'],
+            config=self.tasks_config["responder_task"],
+            output_pydantic=ResponsePlan
         )
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Cybersecurityteam crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
-            verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
+            verbose=False
         )

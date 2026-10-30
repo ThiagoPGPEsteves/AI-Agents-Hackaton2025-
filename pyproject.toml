@@ -1,24 +1,32 @@
 [project]
-name = "gmail_crew_ai"
+name = "cybersecurityteam"
 version = "0.1.0"
-description = "gmail-crew-ai using crewAI"
-authors = [{ name = "Your Name", email = "you@example.com" }]
-requires-python = ">=3.10,<3.13"
+description = "Orquestrador de agentes de cibersegurança usando CrewAI e Gemini"
+authors = [{ name = "Cybersecurity Team", email = "team@example.com" }]
+requires-python = ">=3.10,<3.14"
 dependencies = [
-    "bs4>=0.0.2",
-    "crewai[tools]>=0.102.0,<1.0.0",
+    "crewai[tools,google-genai]>=0.108.0",
+    "google-genai>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "pydantic>=2.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "flask>=3.0.0",
+    "flask-cors>=4.0.0",
+    "pytest>=8.0.0"
 ]
 
 [project.scripts]
-gmail_crew_ai = "gmail_crew_ai.main:run"
-run_crew = "gmail_crew_ai.main:run"
-train = "gmail_crew_ai.main:train"
-replay = "gmail_crew_ai.main:replay"
-test = "gmail_crew_ai.main:test"
+cybersecurityteam = "cybersecurityteam.main:run"
+run_crew = "cybersecurityteam.main:run"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cybersecurityteam/src/cybersecurityteam"]
 
 [tool.crewai]
 type = "crew"
