@@ -1,9 +1,19 @@
+import sys
 import json
 import random
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from .config import settings
+
+if sys.platform == "win32":
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 LEGIT_IPS = [f"10.0.{random.randint(1, 10)}.{random.randint(2, 250)}" for _ in range(15)]
 ATTACK_IPS = ["203.0.113.10", "203.0.113.25", "203.0.113.42", "203.0.113.88"]

@@ -64,10 +64,7 @@ class LogTailer:
                 if clean_line:
                     yield clean_line
 
-            # Atualiza o offset com a posição exata consumida
-            # Subtrai o tamanho do buffer residual não consumido
-            bytes_consumed = f.tell() - len(self._partial_buffer.encode("utf-8", errors="replace"))
-            self._save_offset(bytes_consumed)
+            self._save_offset(f.tell())
 
     def follow(self, poll_interval: float = 0.5) -> Generator[str, None, None]:
         """Loop contínuo de observação de novas linhas."""
