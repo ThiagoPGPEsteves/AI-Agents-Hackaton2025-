@@ -58,31 +58,40 @@ class IncidentFlow(Flow[IncidentFlowState]):
             "samples_text": samples_formatted or "Nenhuma amostra textual registrada."
         }
 
-        try:
-            crew_instance = IncidentCrew().crew()
-            crew_result = crew_instance.kickoff(inputs=inputs)
+        max_retries = 2
+        for attempt in range(max_retries):
+            try:
+                crew_instance = IncidentCrew().crew()
+                crew_result = crew_instance.kickoff(inputs=inputs)
 
-            # Extrai saídas estruturadas
-            # No CrewAI sequencial, o resultado final da Crew é o do último task (ResponsePlan)
-            # e os tasks intermediários podem ser acessados via crew_instance.tasks
-            if hasattr(crew_result, "pydantic") and isinstance(crew_result.pydantic, ResponsePlan):
-                self.state.response_plan = crew_result.pydantic
-            elif hasattr(crew_result, "pydantic") and isinstance(crew_result.pydantic, ThreatAssessment):
-                self.state.assessment = crew_result.pydantic
+                # Extrai saídas estruturadas
+                if hasattr(crew_result, "pydantic") and isinstance(crew_result.pydantic, ResponsePlan):
+                    self.state.response_plan = crew_result.pydantic
+                elif hasattr(crew_result, "pydantic") and isinstance(crew_result.pydantic, ThreatAssessment):
+                    self.state.assessment = crew_result.pydantic
 
-            # Tenta resgatar o assessment da primeira task
-            for t in crew_instance.tasks:
-                if hasattr(t, "output") and t.output and hasattr(t.output, "pydantic"):
-                    if isinstance(t.output.pydantic, ThreatAssessment):
-                        self.state.assessment = t.output.pydantic
-                    elif isinstance(t.output.pydantic, ResponsePlan):
-                        self.state.response_plan = t.output.pydantic
+                # Tenta resgatar o assessment da primeira task
+                for t in crew_instance.tasks:
+                    if hasattr(t, "output") and t.output and hasattr(t.output, "pydantic"):
+                        if isinstance(t.output.pydantic, ThreatAssessment):
+                            self.state.assessment = t.output.pydantic
+                        elif isinstance(t.output.pydantic, ResponsePlan):
+                            self.state.response_plan = t.output.pydantic
 
-            self.state.llm_status = "ok"
+                self.state.llm_status = "ok"
+                break
 
-        except Exception as e:
-            print(f"⚠️ [Flow Warning] Falha na execução da Crew LLM ({e}). Acionando Fail-Safe determinístico.")
-            self.state.llm_status = "fallback"
+            except Exception as e:
+                err_str = str(e)
+                if attempt < max_retries - 1 and any(c in err_str for c in ("503", "429", "UNAVAILABLE", "ResourceExhausted")):
+                    import time
+                    print(f"🔄 [Flow Retry] Provedor Gemini ocupado ({err_str[:60]}...). Tentativa {attempt + 2}/{max_retries} em 2s...")
+                    time.sleep(2)
+                    continue
+
+                print(f"⚠️ [Flow Warning] Falha na execução da Crew LLM ({e}). Acionando Fail-Safe determinístico.")
+                self.state.llm_status = "fallback"
+                break
 
         # Aplica a política com as evidências disponíveis (mesmo em modo fallback)
         self.state.execution_result = self.policy_engine.execute_policy(
