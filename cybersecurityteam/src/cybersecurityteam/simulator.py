@@ -4,6 +4,7 @@ import random
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 from .config import settings
 
 if sys.platform == "win32":
@@ -53,8 +54,14 @@ class LogSimulator:
         self.file_path = settings.base_dir / log_path
         self.file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def generate_single_log(self, force_attack: bool = False, attack_type: str = "random") -> dict:
-        is_attack = force_attack or (random.random() < 0.25)
+    def generate_single_log(self, force_attack: Optional[bool] = None, attack_type: str = "random") -> dict:
+        if force_attack is True:
+            is_attack = True
+        elif force_attack is False:
+            is_attack = False
+        else:
+            is_attack = random.random() < 0.25
+
         now = datetime.now(timezone.utc).isoformat()
 
         if not is_attack:
